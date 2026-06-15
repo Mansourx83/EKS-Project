@@ -54,7 +54,7 @@ resource "aws_security_group" "eks_nodes" {
 resource "aws_eks_cluster" "main" {
   name     = "eks-lab"
   version  = "1.31"
-  role_arn = aws_iam_role.cluster_role.arn
+  role_arn = aws_iam_role.node_role.arn
 
   vpc_config {
     subnet_ids = [
