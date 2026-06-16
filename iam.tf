@@ -86,6 +86,8 @@ resource "aws_iam_role" "pod_role" {
   tags = { Name = "eks-lab-pod-role" }
 }
 
+
+
 resource "aws_iam_role_policy" "pod_s3" {
   name = "eks-lab-pod-s3-policy"
   role = aws_iam_role.pod_role.id
@@ -94,7 +96,13 @@ resource "aws_iam_role_policy" "pod_s3" {
     Version = "2012-10-17"
     Statement = [{
       Effect   = "Allow"
-      Action   = ["s3:ListAllMyBuckets", "sts:GetCallerIdentity"]
+      Action   = [
+        "s3:ListAllMyBuckets",
+        "s3:ListBucket",
+        "s3:GetObject",
+        "s3:GetBucketLocation",
+        "sts:GetCallerIdentity"
+      ]
       Resource = "*"
     }]
   })
