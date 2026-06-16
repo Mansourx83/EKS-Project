@@ -1,6 +1,3 @@
-###############################################################
-# 1. SECURITY GROUP 
-###############################################################
 resource "aws_security_group" "eks_cluster" {
   name        = "eks-lab-cluster-sg"
   description = "EKS Cluster Security Group"
@@ -16,9 +13,6 @@ resource "aws_security_group" "eks_cluster" {
   tags = { Name = "eks-lab-cluster-sg" }
 }
 
-###############################################################
-# 2. SECURITY GROUP
-###############################################################
 resource "aws_security_group" "eks_nodes" {
   name        = "eks-lab-nodes-sg"
   description = "EKS Nodes Security Group"
@@ -48,9 +42,6 @@ resource "aws_security_group" "eks_nodes" {
   tags = { Name = "eks-lab-nodes-sg" }
 }
 
-###############################################################
-# 3. EKS CLUSTER
-###############################################################
 resource "aws_eks_cluster" "main" {
   name     = "eks-lab"
   version  = "1.31"
@@ -77,14 +68,12 @@ resource "aws_eks_cluster" "main" {
     aws_iam_role_policy_attachment.node_worker,
     aws_iam_role_policy_attachment.node_cni,
     aws_iam_role_policy_attachment.node_ecr,
+    aws_iam_role_policy_attachment.node_eks_cluster,
   ]
 
   tags = { Name = "eks-lab" }
 }
 
-###############################################################
-# 4. NODE GROUP 
-###############################################################
 resource "aws_eks_node_group" "main" {
   cluster_name    = aws_eks_cluster.main.name
   node_group_name = "eks-lab-nodes"
@@ -112,14 +101,12 @@ resource "aws_eks_node_group" "main" {
     aws_iam_role_policy_attachment.node_worker,
     aws_iam_role_policy_attachment.node_cni,
     aws_iam_role_policy_attachment.node_ecr,
+    aws_iam_role_policy_attachment.node_eks_cluster,
   ]
 
   tags = { Name = "eks-lab-nodes" }
 }
 
-###############################################################
-# 5. ACCESS ENTRY
-###############################################################
 resource "aws_eks_access_entry" "admin" {
   cluster_name  = aws_eks_cluster.main.name
   principal_arn = aws_iam_role.admin_role.arn
@@ -129,7 +116,7 @@ resource "aws_eks_access_entry" "admin" {
 resource "aws_eks_access_policy_association" "admin" {
   cluster_name  = aws_eks_cluster.main.name
   principal_arn = aws_iam_role.admin_role.arn
-  policy_arn    = "arn:aws:eks::aws:cluster-policy/AmazonEKSClusterAdminPolicy"
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSAdminPolicy"
 
   access_scope { type = "cluster" }
 
