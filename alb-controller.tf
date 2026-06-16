@@ -162,3 +162,32 @@ resource "helm_release" "alb_controller" {
     aws_iam_role_policy_attachment.alb_controller,
   ]
 }
+
+resource "aws_iam_role_policy" "alb_wafv2" {
+  name = "eks-lab-alb-wafv2-policy"
+  role = aws_iam_role.alb_controller.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = [
+          "wafv2:GetWebACL",
+          "wafv2:GetWebACLForResource",
+          "wafv2:AssociateWebACL",
+          "wafv2:DisassociateWebACL",
+          "waf-regional:GetWebACLForResource",
+          "waf-regional:GetWebACL",
+          "waf-regional:AssociateWebACL",
+          "waf-regional:DisassociateWebACL",
+          "shield:GetSubscriptionState",
+          "shield:DescribeProtection",
+          "shield:CreateProtection",
+          "shield:DeleteProtection"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}

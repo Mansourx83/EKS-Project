@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eks-lab
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: nginx-sa
+  namespace: eks-lab
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::250368537583:role/eks-lab-pod-role

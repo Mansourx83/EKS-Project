@@ -84,7 +84,7 @@ resource "aws_eks_node_group" "main" {
     aws_subnet.private_2.id,
   ]
 
-  instance_types = ["t3.micro"]
+  instance_types = ["t3.small"]
 
   scaling_config {
     desired_size = 2

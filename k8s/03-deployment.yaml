@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-s3
+  namespace: eks-lab
+  labels:
+    app: nginx-s3
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-s3
+  template:
+    metadata:
+      labels:
+        app: nginx-s3
+    spec:
+      serviceAccountName: nginx-sa
+      volumes:
+        - name: html
+          emptyDir: {}
+        - name: scripts
+          configMap:
+            name: s3-script
+            defaultMode: 0755
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+
+        - name: s3-fetcher
+          image: amazon/aws-cli:latest
+          command: ["/bin/sh", "/scripts/fetch-s3.sh"]
+          env:
+            - name: AWS_DEFAULT_REGION
+              value: "us-east-1"
+          volumeMounts:
+            - name: html
+              mountPath: /usr/share/nginx/html
+            - name: scripts
+              mountPath: /scripts
